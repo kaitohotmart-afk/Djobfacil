@@ -1,36 +1,167 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MVP - Plataforma de Serviços Moçambique (DJOB FACIL)
 
-## Getting Started
+Plataforma que conecta pessoas que precisam de serviços com pessoas que oferecem serviços, além de marketplace de produtos físicos.
 
-First, run the development server:
+## 🚀 Stack Técnica
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend**: Next.js 14+ (App Router), React 18+, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (Auth, PostgreSQL, Realtime, Storage)
+- **Forms**: React Hook Form + Zod
+- **Deploy**: Vercel (frontend) + Supabase (backend)
+
+## 📋 Pré-requisitos
+
+- Node.js 18+ 
+- npm ou yarn
+- Conta Supabase
+- Conta Vercel (para deploy)
+
+## 🛠️ Setup Local
+
+1. **Clone o repositório**
+   ```bash
+   git clone <repository-url>
+   cd djob-facil
+   ```
+
+2. **Instale as dependências**
+   ```bash
+   npm install
+   ```
+
+3. **Configure as variáveis de ambiente**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Preencha as variáveis no arquivo `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`: URL do seu projeto Supabase
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Chave anon do seu projeto Supabase
+
+4. **Configure o banco de dados Supabase**
+   - Acesse o SQL Editor no Supabase
+   - Execute os scripts de migração em `supabase/migrations/`
+   - Execute o script de seed (dados iniciais) se necessário
+
+5. **Execute em desenvolvimento**
+   ```bash
+   npm run dev
+   ```
+   
+   Acesse [http://localhost:3000](http://localhost:3000)
+
+## 📁 Estrutura do Projeto
+
+```
+djob-facil/
+├── app/
+│   ├── (public)/          # Rotas públicas (Landing, Login, Sign up)
+│   ├── (protected)/       # Rotas protegidas (Dashboard, Pedidos, etc)
+│   ├── admin/             # Painel administrativo
+│   └── api/               # API Routes
+├── components/
+│   ├── ui/                # shadcn/ui components
+│   ├── layout/            # Layout components
+│   └── forms/             # Form components
+├── lib/
+│   ├── supabase/          # Configuração Supabase
+│   ├── utils.ts           # Utilitários
+│   ├── validations.ts     # Schemas Zod
+│   └── constants.ts       # Constantes (províncias, categorias)
+├── types/                 # TypeScript types
+└── supabase/
+    └── migrations/        # SQL migrations
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 👥 Admin
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para marcar um usuário como administrador:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sql
+UPDATE users 
+SET role = 'admin' 
+WHERE email = 'kaitoluismiropo@gmail.com';
+```
 
-## Learn More
+## 🔧 Comandos Principais
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Desenvolvimento
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Build para produção
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Executar produção localmente
+npm start
 
-## Deploy on Vercel
+# Lint
+npm run lint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📦 Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Vercel (Automático)
+
+1. Conecte o repositório ao Vercel
+2. Configure as variáveis de ambiente
+3. Deploy automático a cada push na branch main
+
+### Supabase
+
+1. Projeto já configurado em cloud.supabase.com
+2. Migrations aplicadas automaticamente via CLI (futuro)
+
+## 🗺️ Roadmap
+
+### ✅  Etapa 1: Base + Autenticação (Semanas 1-2)
+- Setup do projeto
+- Autenticação completa
+- Landing Page
+- Dashboard básico
+
+### 📍 Etapa 2: Painel Admin (Semana 3)
+- Dashboard admin
+- Gestão de usuários
+- Gestão de conteúdo
+
+### Etapa 3: Pedidos (Semana 4)
+- Criar e listar pedidos
+- Responder pedidos
+- Chat básico
+
+### Etapa 4: Serviços (Semana 5)
+- Criar e listar serviços
+- Diferenciação Local/Digital
+- Admin em chats digitais
+
+### Etapa 5: Marketplace (Semana 6)
+- Publicar produtos
+- Upload de fotos
+- Chat de produtos
+
+### Etapa 6: Chat Completo (Semana 7)
+- Supabase Realtime
+- Interface polida
+- Avisos automáticos
+
+### Etapa 7: Perfis (Semana 8)
+- Perfil público
+- Minha Conta
+- Editar perfil
+
+### Etapa 8: Polimento e Deploy (Semanas 9-10)
+- Testes
+- Responsividade
+- Performance
+- Deploy final
+
+## 📞 Contato
+
+Para dúvidas e suporte durante o desenvolvimento, entre em contato com a equipe.
+
+## 📄 Licença
+
+[Definir licença]
+
