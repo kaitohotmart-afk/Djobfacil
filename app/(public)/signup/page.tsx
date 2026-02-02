@@ -40,35 +40,19 @@ export default function SignupPage() {
         setError(null)
 
         try {
-            const supabase = createClient()
+            const { signUp } = await import('./actions')
+            const result = await signUp(data)
 
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: data.email,
-                password: data.password,
-            })
-
-            if (authError) throw authError
-            if (!authData.user) throw new Error('Falha ao criar usuário')
-
-            const { error: dbError } = await supabase.from('users').insert({
-                id: authData.user.id,
-                email: data.email,
-                password_hash: 'managed_by_supabase_auth',
-                nome_completo: data.nome_completo,
-                provincia: data.provincia,
-                cidade: data.cidade,
-                bairro: data.bairro || null,
-                tipo_conta: data.tipo_conta,
-                termos_aceitos: true,
-            })
-
-            if (dbError) throw dbError
+            if (result?.error) {
+                setError(result.error)
+                return
+            }
 
             router.push('/dashboard')
             router.refresh()
         } catch (err: any) {
             console.error('Error signing up:', err)
-            setError(err.message || 'Ocorreu um erro ao criar sua conta. Tente novamente.')
+            setError('Ocorreu um erro ao criar sua conta. Tente novamente.')
         } finally {
             setIsLoading(false)
         }
@@ -218,7 +202,7 @@ export default function SignupPage() {
                                             Província <span className="text-red-400">*</span>
                                         </Label>
                                         <Select
-                                            value={watch('provincia')}
+                                            value={watch('provincia') || ""}
                                             onValueChange={(value) => setValue('provincia', value as any)}
                                         >
                                             <SelectTrigger className={`mt-2 bg-slate-800/50 border-white/10 text-white focus:border-blue-500/50 focus:ring-blue-500/20 ${errors.provincia ? 'border-red-500/50' : ''}`}>
@@ -318,12 +302,12 @@ export default function SignupPage() {
                             </div>
 
                             {/* Termos */}
-                            <div className="flex items-start space-x-3 p-4 rounded-lg bg-slate-800/30 border border-white/5">
+                            <div className={`flex items-start space-x-3 p-4 rounded-lg bg-slate-800/30 border transition-all ${errors.termos_aceitos ? 'border-red-500/50' : 'border-white/5'}`}>
                                 <Checkbox
                                     id="termos"
-                                    checked={termosAceitos}
+                                    checked={termosAceitos || false}
                                     onCheckedChange={(checked) => setValue('termos_aceitos', checked as boolean)}
-                                    className="mt-1 border-white/20"
+                                    className={`mt-1 ${errors.termos_aceitos ? 'border-red-500' : 'border-white/20'}`}
                                 />
                                 <Label htmlFor="termos" className="font-normal text-sm cursor-pointer text-gray-300 leading-relaxed">
                                     Aceito os termos de uso e política de privacidade da plataforma{' '}
@@ -332,6 +316,16 @@ export default function SignupPage() {
                             </div>
                             {errors.termos_aceitos && (
                                 <p className="text-sm text-red-400">{errors.termos_aceitos.message}</p>
+                            )}
+                            {!termosAceitos && (
+                                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                                    <p className="text-sm text-amber-400 flex items-center gap-2">
+                                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                        </svg>
+                                        Você deve aceitar os termos de uso para criar uma conta
+                                    </p>
+                                </div>
                             )}
 
                             {/* Error Message */}
@@ -344,9 +338,9 @@ export default function SignupPage() {
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-6 text-lg shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all"
+                                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-6 text-lg shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"
                                 size="lg"
-                                disabled={isLoading}
+                                disabled={isLoading || !termosAceitos}
                             >
                                 {isLoading ? (
                                     <>

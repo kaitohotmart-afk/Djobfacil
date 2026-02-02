@@ -16,9 +16,7 @@ export const signupSchema = z.object({
         .min(6, 'Senha deve ter pelo menos 6 caracteres')
         .max(100, 'Senha muito longa'),
     confirmPassword: z.string(),
-    provincia: z.enum(PROVINCIAS, {
-        errorMap: () => ({ message: 'Selecione uma província' }),
-    }),
+    provincia: z.enum(PROVINCIAS),
     cidade: z
         .string()
         .min(2, 'Cidade deve ter pelo menos 2 caracteres')
@@ -28,12 +26,8 @@ export const signupSchema = z.object({
         .max(100, 'Bairro muito longo')
         .optional()
         .or(z.literal('')),
-    tipo_conta: z.enum(['prestador', 'cliente', 'ambos'], {
-        errorMap: () => ({ message: 'Selecione o tipo de conta' }),
-    }),
-    termos_aceitos: z.literal(true, {
-        errorMap: () => ({ message: 'Você deve aceitar os termos de uso' }),
-    }),
+    tipo_conta: z.enum(['prestador', 'cliente', 'ambos']),
+    termos_aceitos: z.literal(true),
 }).refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',
     path: ['confirmPassword'],
@@ -67,12 +61,18 @@ export const createRequestSchema = z.object({
         .min(20, 'Descrição deve ter pelo menos 20 caracteres')
         .max(2000, 'Descrição muito longa'),
     categoria: z.string().min(1, 'Selecione uma categoria'),
+    tipo: z.enum(['presencial', 'digital']),
     provincia: z.enum(PROVINCIAS),
     cidade: z
         .string()
         .min(2, 'Cidade deve ter pelo menos 2 caracteres')
         .max(100, 'Cidade muito longa'),
-    urgente: z.boolean().default(false),
+    bairro: z.string().max(100).optional(),
+    data_desejada: z.string().optional(),
+    horario: z.string().max(50).optional(),
+    prazo_entrega: z.string().max(100).optional(),
+    referencia_link: z.string().optional(),
+    urgente: z.boolean(),
 })
 
 export type CreateRequestFormData = z.infer<typeof createRequestSchema>
@@ -93,9 +93,7 @@ export const createServiceSchema = z.object({
         .string()
         .min(2, 'Cidade deve ter pelo menos 2 caracteres')
         .max(100, 'Cidade muito longa'),
-    tipo: z.enum(['local', 'digital'], {
-        errorMap: () => ({ message: 'Selecione o tipo de serviço' }),
-    }),
+    tipo: z.enum(['local', 'digital']),
 })
 
 export type CreateServiceFormData = z.infer<typeof createServiceSchema>

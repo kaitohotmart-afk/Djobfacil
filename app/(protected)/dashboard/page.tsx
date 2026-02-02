@@ -53,10 +53,10 @@ export default async function DashboardPage() {
                                 <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
                             </Link>
                             <Link href="/pedidos" className="text-gray-400 hover:text-gray-200 transition-colors">
-                                Pedidos
+                                Preciso de Profissional
                             </Link>
                             <Link href="/servicos" className="text-gray-400 hover:text-gray-200 transition-colors">
-                                Serviços
+                                Oferecer Meus Serviços
                             </Link>
                             <Link href="/marketplace" className="text-gray-400 hover:text-gray-200 transition-colors">
                                 Marketplace
@@ -115,18 +115,17 @@ export default async function DashboardPage() {
                                 <Briefcase className="h-8 w-8 text-white" />
                             </div>
                             <h2 className="text-2xl font-bold mb-3 text-white flex items-center gap-2">
-                                💼 Pedidos Ativos
-                                <Badge className="bg-blue-500/20 text-blue-300 text-xs">Em breve</Badge>
+                                📢 Preciso de um Profissional
                             </h2>
                             <p className="text-gray-400 leading-relaxed mb-4">
-                                Em breve você verá pedidos de serviços disponíveis na sua região
+                                Publique o que você precisa e receba propostas de profissionais.
                             </p>
                             <Button
                                 variant="outline"
                                 className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50"
-                                disabled
+                                asChild
                             >
-                                Ver Pedidos
+                                <Link href="/pedidos">Ver Pedidos</Link>
                             </Button>
                         </div>
                     </Card>
@@ -138,18 +137,18 @@ export default async function DashboardPage() {
                                 <Users className="h-8 w-8 text-white" />
                             </div>
                             <h2 className="text-2xl font-bold mb-3 text-white flex items-center gap-2">
-                                🛠️ Serviços
-                                <Badge className="bg-cyan-500/20 text-cyan-300 text-xs">Em breve</Badge>
+                                🛠️ Oferecer Meus Serviços
+                                <Badge className="bg-cyan-500/20 text-cyan-300 text-xs">Novo</Badge>
                             </h2>
                             <p className="text-gray-400 leading-relaxed mb-4">
-                                Em breve você verá serviços disponíveis (locais e digitais)
+                                Crie seu perfil profissional e encontre clientes na sua região ou online.
                             </p>
                             <Button
                                 variant="outline"
                                 className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/50"
-                                disabled
+                                asChild
                             >
-                                Ver Serviços
+                                <Link href="/servicos">Ver Serviços</Link>
                             </Button>
                         </div>
                     </Card>
@@ -157,22 +156,22 @@ export default async function DashboardPage() {
                     <Card className="group relative overflow-hidden bg-gradient-to-br from-slate-900/80 to-slate-800/80 border-white/10 p-8 hover:border-purple-500/50 transition-all hover:shadow-2xl hover:shadow-purple-500/20 backdrop-blur-sm">
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-transparent transition-all"></div>
                         <div className="relative">
-                            <div className="bg-gradient-to-br from-purple-600 to-pink-600 p-4 rounded-2xl w-fit mb-6 group-hover:scale-110 transition-transform">
+                            <div className="bg-gradient-to-br from-purple-600 to-indigo-600 p-4 rounded-2xl w-fit mb-6 group-hover:scale-110 transition-transform">
                                 <ShoppingBag className="h-8 w-8 text-white" />
                             </div>
                             <h2 className="text-2xl font-bold mb-3 text-white flex items-center gap-2">
-                                🛒 Marketplace
-                                <Badge className="bg-purple-500/20 text-purple-300 text-xs">Em breve</Badge>
+                                🛍️ Marketplace
+                                <Badge className="bg-purple-500/20 text-purple-300 text-xs">Ativo</Badge>
                             </h2>
                             <p className="text-gray-400 leading-relaxed mb-4">
-                                Em breve você verá produtos físicos disponíveis para compra
+                                Compre e venda produtos físicos com segurança na sua região.
                             </p>
                             <Button
                                 variant="outline"
                                 className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500/50"
-                                disabled
+                                asChild
                             >
-                                Ver Produtos
+                                <Link href="/marketplace">Ver Marketplace</Link>
                             </Button>
                         </div>
                     </Card>

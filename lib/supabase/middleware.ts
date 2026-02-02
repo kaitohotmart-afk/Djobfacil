@@ -35,43 +35,40 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Rotas públicas
-    const publicRoutes = ['/', '/login', '/signup', '/recuperar-senha']
-    const isPublicRoute = publicRoutes.some((route) =>
+    // Rotas de autenticação (redirecionar se já estiver logado)
+    const authRoutes = ['/login', '/signup', '/recuperar-senha']
+    const isAuthRoute = authRoutes.some((route) =>
         request.nextUrl.pathname.startsWith(route)
     )
 
     // Rotas admin
     const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
 
-    // Não logado tentando acessar rota protegida → redirect para landing
-    if (!user && !isPublicRoute && request.nextUrl.pathname !== '/') {
+    // Não logado tentando acessar rota protegida (tudo que não é público e não é home)
+    // Se não é rota publica (authRoutes + home + public assets ignorados pelo matcher)
+    // Na verdade, queremos proteger /dashboard e /admin e /pedidos etc.
+    // Estratégia: Proteger tudo, exceto publicRoutes.
+
+    // Lista explícita de rotas públicas
+    const publicPaths = ['/', '/login', '/signup', '/recuperar-senha']
+    const isPublicPath = publicPaths.some(path => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/'))
+
+    if (!user && !isPublicPath) {
+        // Se não logado e tentando acessar rota protegida
         const url = request.nextUrl.clone()
-        url.pathname = '/'
+        url.pathname = '/login'
         return NextResponse.redirect(url)
     }
 
-    // Logado tentando acessar rota pública → redirect para dashboard
-    if (user && isPublicRoute && request.nextUrl.pathname !== '/dashboard') {
+    // Logado tentando acessar páginas de login/signup
+    if (user && isAuthRoute) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)
     }
 
-    // Verificar permissão admin
-    if (isAdminRoute && user) {
-        const { data: userData } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single()
+    // Admin: O middleware apenas deixa passar. A proteção real de role está no layout/page admin.
 
-        if (userData?.role !== 'admin') {
-            const url = request.nextUrl.clone()
-            url.pathname = '/dashboard'
-            return NextResponse.redirect(url)
-        }
-    }
 
     return supabaseResponse
 }
