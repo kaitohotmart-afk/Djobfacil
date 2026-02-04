@@ -50,7 +50,16 @@ export async function updateSession(request: NextRequest) {
     // Estratégia: Proteger tudo, exceto publicRoutes.
 
     // Lista explícita de rotas públicas
-    const publicPaths = ['/', '/login', '/signup', '/recuperar-senha']
+    const publicPaths = [
+        '/',
+        '/login',
+        '/signup',
+        '/recuperar-senha',
+        '/termos-de-uso',
+        '/politica-privacidade',
+        '/auth', // Necessário para callbacks de OAuth
+        '/completar-perfil' // Usuários novos ainda não têm perfil completo
+    ]
     const isPublicPath = publicPaths.some(path => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/'))
 
     if (!user && !isPublicPath) {
