@@ -15,7 +15,21 @@ export async function sendMessage(
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Não autorizado' }
 
-    if (!content.trim() && !fileUrl) return { error: 'Mensagem vazia' }
+    const { data: conv } = await supabase
+        .from('conversations')
+        .select('tipo_conversa')
+        .eq('id', conversationId)
+        .single()
+
+    // Filter sensitive info in digital services
+    if (conv?.tipo_conversa === 'servico_digital' && type === 'normal') {
+        const { containsSensitiveInfo } = await import('@/lib/security')
+        if (containsSensitiveInfo(content)) {
+            return {
+                error: 'MENSAGEM BLOQUEADA: Por segurança, não é permitido enviar números de telefone ou links externos em chats de serviços digitais.'
+            }
+        }
+    }
 
     // Insert message
     const { error } = await supabase
