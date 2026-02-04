@@ -36,7 +36,10 @@ export async function GET(request: Request) {
                     .insert({
                         id: data.user.id,
                         email: data.user.email!,
-                        nome_completo: data.user.user_metadata.full_name || data.user.email!.split('@')[0],
+                        nome_completo: data.user.user_metadata.full_name ||
+                            data.user.user_metadata.name ||
+                            data.user.user_metadata.preferred_username ||
+                            data.user.email!.split('@')[0],
                         password_hash: '', // Empty for OAuth users
                         tipo_conta: 'ambos',
                         termos_aceitos: true,
