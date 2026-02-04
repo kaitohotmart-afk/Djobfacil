@@ -1,5 +1,6 @@
 'use server'
 
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { signupSchema, type SignupFormData } from '@/lib/validations'
 import { revalidatePath } from 'next/cache'
@@ -34,8 +35,10 @@ export async function signUp(data: SignupFormData) {
                 })
 
                 if (existingUser.user) {
+                    const adminSupabase = createAdminClient()
+
                     // Check if profile exists
-                    const { data: profile } = await supabase
+                    const { data: profile } = await adminSupabase
                         .from('users')
                         .select('id')
                         .eq('id', existingUser.user.id)
@@ -43,7 +46,7 @@ export async function signUp(data: SignupFormData) {
 
                     if (!profile) {
                         // Profile missing, try to create it
-                        const { error: insertError } = await supabase.from('users').insert({
+                        const { error: insertError } = await adminSupabase.from('users').insert({
                             id: existingUser.user.id,
                             email: result.data.email,
                             password_hash: 'managed_by_supabase_auth',
@@ -53,6 +56,7 @@ export async function signUp(data: SignupFormData) {
                             bairro: result.data.bairro || null,
                             tipo_conta: result.data.tipo_conta,
                             termos_aceitos: true,
+                            perfil_completo: true, // Manual signup provides all info
                         })
                         if (insertError) throw insertError
                         return { success: true }
@@ -64,8 +68,9 @@ export async function signUp(data: SignupFormData) {
 
         if (!authData.user) throw new Error('Falha ao criar usuário')
 
-        // Create public profile
-        const { error: dbError } = await supabase.from('users').insert({
+        // Create public profile using Admin Client to bypass RLS
+        const adminSupabase = createAdminClient()
+        const { error: dbError } = await adminSupabase.from('users').insert({
             id: authData.user.id,
             email: result.data.email,
             password_hash: 'managed_by_supabase_auth',
@@ -75,6 +80,7 @@ export async function signUp(data: SignupFormData) {
             bairro: result.data.bairro || null,
             tipo_conta: result.data.tipo_conta,
             termos_aceitos: true,
+            perfil_completo: true, // Manual signup provides all info
         })
 
         if (dbError) throw dbError
