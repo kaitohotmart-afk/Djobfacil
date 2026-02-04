@@ -425,39 +425,7 @@ export default function SignupPage() {
                                 Cadastrar com Google
                             </Button>
 
-                            {/* Facebook OAuth Button */}
-                            <Button
-                                type="button"
-                                onClick={async () => {
-                                    setIsLoading(true)
-                                    try {
-                                        console.log('Iniciando cadastro com Facebook...')
-                                        const supabase = createClient()
-                                        const { error } = await supabase.auth.signInWithOAuth({
-                                            provider: 'facebook',
-                                            options: {
-                                                redirectTo: `${window.location.origin}/auth/callback`,
-                                            },
-                                        })
 
-                                        if (error) {
-                                            throw error
-                                        }
-                                    } catch (err: any) {
-                                        console.error('Erro ao iniciar OAuth:', err)
-                                        setError(`Erro ao conectar com Facebook: ${err.message}`)
-                                        setIsLoading(false)
-                                    }
-                                }}
-                                variant="outline"
-                                className="w-full bg-[#1877F2] hover:bg-[#1874ea] text-white py-6 text-base border-none hover:opacity-90 transition-all mt-3"
-                                size="lg"
-                            >
-                                <svg className="mr-3 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v2.277h-2.628c-1.991 0-2.199 1.112-2.199 2.949v2.033h4.195l-1 3.667h-3.195v7.98h-3.64z" />
-                                </svg>
-                                Cadastrar com Facebook
-                            </Button>
 
                         </form>
                     </Card>
