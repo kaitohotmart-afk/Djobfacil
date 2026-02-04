@@ -27,7 +27,9 @@ export const signupSchema = z.object({
         .optional()
         .or(z.literal('')),
     tipo_conta: z.enum(['prestador', 'cliente', 'ambos']),
-    termos_aceitos: z.literal(true),
+    termos_aceitos: z.boolean().refine((val) => val === true, {
+        message: 'Você deve aceitar os termos de uso',
+    }),
 }).refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',
     path: ['confirmPassword'],

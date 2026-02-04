@@ -309,10 +309,20 @@ export default function SignupPage() {
                                     onCheckedChange={(checked) => setValue('termos_aceitos', checked as boolean)}
                                     className={`mt-1 ${errors.termos_aceitos ? 'border-red-500' : 'border-white/20'}`}
                                 />
-                                <Label htmlFor="termos" className="font-normal text-sm cursor-pointer text-gray-300 leading-relaxed">
-                                    Aceito os termos de uso e política de privacidade da plataforma{' '}
-                                    <span className="text-red-400">*</span>
-                                </Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="termos" className="font-bold text-slate-100 cursor-pointer text-xs uppercase tracking-wider block">
+                                        ☑️ DECLARO QUE LI E ACEITO OS TERMOS DE USO DA PLATAFORMA
+                                    </Label>
+                                    <p className="text-xs text-gray-400 leading-relaxed">
+                                        Ao marcar esta opção, confirmo que compreendo e aceito que:
+                                        A plataforma é tecnológica, não financeira; Serviços digitais são intermediados;
+                                        Existe uma taxa de serviço; Pagamentos devem ser feitos apenas pelos meios oficiais;
+                                        Negociações fora da plataforma não são protegidas; O chat é o registro oficial.
+                                        <Link href="/termos-de-uso" target="_blank" className="text-blue-400 hover:text-blue-300 ml-1 underline decoration-blue-400/30 underline-offset-4">
+                                            Ver Termos de Uso completos
+                                        </Link>
+                                    </p>
+                                </div>
                             </div>
                             {errors.termos_aceitos && (
                                 <p className="text-sm text-red-400">{errors.termos_aceitos.message}</p>

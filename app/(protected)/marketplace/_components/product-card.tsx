@@ -18,13 +18,16 @@ interface ProductCardProps {
         foto_url: string | null
         user_id: string
     }
+    currentUserId?: string
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, currentUserId }: ProductCardProps) {
     const formattedPrice = new Intl.NumberFormat('pt-MZ', {
         style: 'currency',
         currency: 'MZN',
     }).format(product.preco)
+
+    const isOwner = currentUserId === product.user_id
 
     return (
         <Card className="group relative bg-slate-900/40 border-slate-800 hover:border-blue-500/50 transition-all duration-500 overflow-hidden flex flex-col h-full shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] backdrop-blur-md">
@@ -75,12 +78,17 @@ export function ProductCard({ product }: ProductCardProps) {
             </CardContent>
 
             <CardFooter className="p-5 pt-0">
-                <Button className="w-full bg-slate-800/50 hover:bg-blue-600 text-white font-bold h-11 border border-slate-700/50 group-hover:border-blue-500/30 group-hover:shadow-lg group-hover:shadow-blue-900/40 transition-all rounded-xl relative overflow-hidden group/btn" asChild>
+                <Button className={cn(
+                    "w-full font-bold h-11 border transition-all rounded-xl relative overflow-hidden group/btn",
+                    isOwner
+                        ? "bg-slate-800 text-slate-300 hover:bg-slate-700 border-slate-700"
+                        : "bg-slate-800/50 hover:bg-blue-600 text-white border-slate-700/50 group-hover:border-blue-500/30 group-hover:shadow-lg group-hover:shadow-blue-900/40"
+                )} asChild>
                     <Link href={`/marketplace/${product.id}`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                        <div className={cn("absolute inset-0 transition-opacity", isOwner ? "bg-slate-700/0" : "bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover/btn:opacity-100")} />
                         <span className="relative flex items-center justify-center gap-2">
                             <ShoppingCart className="h-4 w-4" />
-                            Ver Detalhes
+                            {isOwner ? 'Gerenciar Produto' : 'Ver Detalhes'}
                         </span>
                     </Link>
                 </Button>

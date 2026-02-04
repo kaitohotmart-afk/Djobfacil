@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ShieldCheck, MessageSquare, Users, Package, Sparkles, Zap, Heart, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Footer } from '@/components/footer'
 
 export default function LandingPage() {
   return (
@@ -297,21 +298,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative border-t border-white/10 bg-slate-950/50 backdrop-blur-xl py-12">
-        <div className="container mx-auto px-4 text-center space-y-4">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="bg-gradient-to-br from-blue-600 to-cyan-600 p-2 rounded-lg">
-              <Package className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              DJOB FACIL
-            </span>
-          </div>
-          <p className="text-gray-400">&copy; 2026 DJOB FACIL. Todos os direitos reservados.</p>
-          <p className="text-sm text-gray-500">Plataforma moçambicana de serviços e marketplace</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

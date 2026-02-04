@@ -3,18 +3,22 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { MapPin, Laptop, User, ArrowRight, Clock } from 'lucide-react'
+import { MapPin, Laptop, User, ArrowRight, Clock, Star } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { getUserRating } from '@/app/(protected)/reviews/actions'
 
 interface ServiceCardProps {
     service: any
     currentUserId?: string
 }
 
-export function ServiceCard({ service, currentUserId }: ServiceCardProps) {
+export async function ServiceCard({ service, currentUserId }: ServiceCardProps) {
     const isOwner = currentUserId === service.user_id
     const isDigital = service.tipo === 'digital'
+
+    // Fetch rating
+    const { average, count } = await getUserRating(service.user_id)
 
     return (
         <Card className="flex flex-col h-full bg-slate-900/40 border-slate-800 hover:border-blue-500/50 transition-all duration-500 group overflow-hidden shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] backdrop-blur-md">
@@ -68,7 +72,18 @@ export function ServiceCard({ service, currentUserId }: ServiceCardProps) {
                         <span className="text-xs text-slate-300 font-bold group-hover:text-blue-400 transition-colors line-clamp-1">
                             {service.author?.nome_completo || 'Profissional'}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-medium">Prestador</span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] text-slate-500 font-medium">Prestador</span>
+                            {count > 0 && (
+                                <>
+                                    <span className="text-[10px] text-slate-600">•</span>
+                                    <span className="flex items-center text-[10px] text-amber-400 font-bold">
+                                        <Star className="w-2.5 h-2.5 mr-0.5 fill-amber-400" />
+                                        {average} <span className="text-slate-500 ml-0.5 font-normal">({count})</span>
+                                    </span>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 

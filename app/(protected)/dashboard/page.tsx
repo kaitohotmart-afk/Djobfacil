@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Package, LogOut, Sparkles, Briefcase, ShoppingBag, Users } from 'lucide-react'
+import { Package, LogOut, Sparkles, Briefcase, ShoppingBag, Users, MessageCircle, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,6 +22,27 @@ export default async function DashboardPage() {
         .select('*')
         .eq('id', user.id)
         .single()
+
+    // Fetch user's conversations
+    const { data: conversations } = await supabase
+        .from('conversations')
+        .select('*, messages(id, sender_id, lida_por)')
+        .or(`cliente_id.eq.${user.id},prestador_id.eq.${user.id}`)
+        .order('updated_at', { ascending: false })
+        .limit(5)
+
+    // Calculate total unread messages
+    let totalUnread = 0
+    if (conversations) {
+        for (const conv of conversations) {
+            const messages = Array.isArray(conv.messages) ? conv.messages : []
+            const unread = messages.filter((msg: any) => {
+                const lidaPor = msg.lida_por || {}
+                return msg.sender_id !== user.id && !lidaPor[user.id]
+            }).length
+            totalUnread += unread
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
@@ -61,10 +82,20 @@ export default async function DashboardPage() {
                             <Link href="/marketplace" className="text-gray-400 hover:text-gray-200 transition-colors">
                                 Marketplace
                             </Link>
+                            <Link href="/chat" className="flex items-center gap-1.5 text-gray-400 hover:text-gray-200 transition-colors">
+                                <MessageCircle className="h-4 w-4" />
+                                Chats
+                            </Link>
                         </nav>
 
-                        <div className="flex items-center gap-4">
-                            <div className="hidden sm:flex flex-col items-end">
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" className="md:hidden text-gray-400 hover:text-white" asChild>
+                                <Link href="/chat">
+                                    <MessageCircle className="h-5 w-5" />
+                                </Link>
+                            </Button>
+
+                            <div className="hidden sm:flex flex-col items-end mr-2">
                                 <span className="text-sm font-medium text-white">
                                     {userData?.nome_completo || user.email}
                                 </span>
@@ -72,10 +103,16 @@ export default async function DashboardPage() {
                                     {userData?.provincia}
                                 </span>
                             </div>
+
+                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-white/10" asChild title="Editar Perfil">
+                                <Link href="/conta/perfil">
+                                    <Settings className="h-5 w-5" />
+                                </Link>
+                            </Button>
+
                             <form action="/api/auth/signout" method="post">
-                                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
-                                    <LogOut className="h-4 w-4 mr-2" />
-                                    Sair
+                                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-white/10" title="Sair">
+                                    <LogOut className="h-5 w-5" />
                                 </Button>
                             </form>
                         </div>
@@ -107,7 +144,7 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Cards Grid */}
-                <div className="grid md:grid-cols-3 gap-6 max-w-6xl">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl">
                     <Card className="group relative overflow-hidden bg-gradient-to-br from-slate-900/80 to-slate-800/80 border-white/10 p-8 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-500/20 backdrop-blur-sm">
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-transparent transition-all"></div>
                         <div className="relative">
@@ -172,6 +209,40 @@ export default async function DashboardPage() {
                                 asChild
                             >
                                 <Link href="/marketplace">Ver Marketplace</Link>
+                            </Button>
+                        </div>
+                    </Card>
+
+                    <Card className="group relative overflow-hidden bg-gradient-to-br from-slate-900/80 to-slate-800/80 border-white/10 p-8 hover:border-green-500/50 transition-all hover:shadow-2xl hover:shadow-green-500/20 backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-500/0 to-green-500/0 group-hover:from-green-500/5 group-hover:to-transparent transition-all"></div>
+                        <div className="relative">
+                            <div className="bg-gradient-to-br from-green-600 to-emerald-600 p-4 rounded-2xl w-fit mb-6 group-hover:scale-110 transition-transform relative">
+                                <MessageCircle className="h-8 w-8 text-white" />
+                                {totalUnread > 0 && (
+                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                                        {totalUnread > 9 ? '9+' : totalUnread}
+                                    </div>
+                                )}
+                            </div>
+                            <h2 className="text-2xl font-bold mb-3 text-white flex items-center gap-2">
+                                💬 Minhas Conversas
+                                {totalUnread > 0 && (
+                                    <Badge className="bg-red-500/20 text-red-300 text-xs animate-pulse">
+                                        {totalUnread} nova{totalUnread !== 1 ? 's' : ''}
+                                    </Badge>
+                                )}
+                            </h2>
+                            <p className="text-gray-400 leading-relaxed mb-4">
+                                {conversations && conversations.length > 0
+                                    ? `Você tem ${conversations.length} conversa${conversations.length !== 1 ? 's' : ''} ativa${conversations.length !== 1 ? 's' : ''}.`
+                                    : 'Suas conversas com clientes e prestadores.'}
+                            </p>
+                            <Button
+                                variant="outline"
+                                className="w-full border-green-500/30 text-green-400 hover:bg-green-500/10 hover:border-green-500/50"
+                                asChild
+                            >
+                                <Link href="/chat">Ver Conversas</Link>
                             </Button>
                         </div>
                     </Card>

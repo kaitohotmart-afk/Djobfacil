@@ -4,7 +4,7 @@ import { ProductCard } from './_components/product-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PlusCircle, ShoppingBag, Search, FilterX, AlertTriangle, ShoppingCart } from 'lucide-react'
+import { PlusCircle, ShoppingBag, Search, FilterX, AlertTriangle, ShoppingCart, MapPin } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
@@ -14,6 +14,9 @@ export default async function MarketplacePage(props: {
         categoria?: string
         provincia?: string
         search?: string
+        min_price?: string
+        max_price?: string
+        cidade?: string
     }>
 }) {
     const searchParams = await props.searchParams
@@ -35,6 +38,15 @@ export default async function MarketplacePage(props: {
     if (searchParams.search) {
         query = query.ilike('titulo', `%${searchParams.search}%`)
     }
+    if (searchParams.cidade) {
+        query = query.ilike('cidade', `%${searchParams.cidade}%`)
+    }
+    if (searchParams.min_price) {
+        query = query.gte('preco', parseFloat(searchParams.min_price))
+    }
+    if (searchParams.max_price) {
+        query = query.lte('preco', parseFloat(searchParams.max_price))
+    }
 
     const { data: products, error } = await query
 
@@ -42,7 +54,7 @@ export default async function MarketplacePage(props: {
         <div className="min-h-screen bg-[#0B1120] text-gray-100 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-7xl space-y-10">
 
-                {/* Header Section */}
+                {/* Header Section ... */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="space-y-2">
                         <h1 className="text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
@@ -61,7 +73,7 @@ export default async function MarketplacePage(props: {
                     </Button>
                 </div>
 
-                {/* Security Warning */}
+                {/* Security Warning ... */}
                 <div className="bg-amber-900/10 border border-amber-500/20 rounded-2xl p-6 flex flex-col sm:flex-row gap-4 items-center">
                     <div className="p-3 bg-amber-500/20 rounded-full shrink-0">
                         <AlertTriangle className="h-6 w-6 text-amber-500" />
@@ -76,55 +88,94 @@ export default async function MarketplacePage(props: {
 
                 {/* Search and Filters Bar */}
                 <Card className="bg-slate-900/50 border-slate-800 p-6 rounded-2xl backdrop-blur-md sticky top-6 z-10 shadow-xl border-white/5">
-                    <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Search */}
-                        <div className="relative group">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
-                            <Input
-                                name="search"
-                                placeholder="O que você procura?"
-                                defaultValue={searchParams.search}
-                                className="pl-10 bg-black/20 border-slate-700 focus:bg-black/40 text-white placeholder:text-slate-500 transition-all h-11"
-                            />
+                    <form className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {/* Search */}
+                            <div className="relative group">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
+                                <Input
+                                    name="search"
+                                    placeholder="O que você procura?"
+                                    defaultValue={searchParams.search}
+                                    className="pl-10 bg-black/20 border-slate-700 focus:bg-black/40 text-white placeholder:text-slate-500 transition-all h-11"
+                                />
+                            </div>
+
+                            {/* Category */}
+                            <Select name="categoria" defaultValue={searchParams.categoria || 'todas'}>
+                                <SelectTrigger className="bg-black/20 border-slate-700 text-white h-11">
+                                    <SelectValue placeholder="Categoria" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                    <SelectItem value="todas">Todas Categorias</SelectItem>
+                                    {CATEGORIAS_PRODUTOS.map(cat => (
+                                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Province */}
+                            <Select name="provincia" defaultValue={searchParams.provincia || 'todas'}>
+                                <SelectTrigger className="bg-black/20 border-slate-700 text-white h-11">
+                                    <SelectValue placeholder="Província" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                    <SelectItem value="todas">Todas Províncias</SelectItem>
+                                    {PROVINCIAS.map(prov => (
+                                        <SelectItem key={prov} value={prov}>{prov}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* City/Bairro */}
+                            <div className="relative group">
+                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
+                                <Input
+                                    name="cidade"
+                                    placeholder="Cidade ou Bairro"
+                                    defaultValue={searchParams.cidade}
+                                    className="pl-10 bg-black/20 border-slate-700 focus:bg-black/40 text-white placeholder:text-slate-500 transition-all h-11"
+                                />
+                            </div>
                         </div>
 
-                        {/* Category */}
-                        <Select name="categoria" defaultValue={searchParams.categoria || 'todas'}>
-                            <SelectTrigger className="bg-black/20 border-slate-700 text-white h-11">
-                                <SelectValue placeholder="Categoria" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                <SelectItem value="todas">Todas Categorias</SelectItem>
-                                {CATEGORIAS_PRODUTOS.map(cat => (
-                                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            {/* Price Min */}
+                            <div className="space-y-1.5">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 ml-1">Preço Mínimo (MZN)</span>
+                                <Input
+                                    name="min_price"
+                                    type="number"
+                                    placeholder="0"
+                                    defaultValue={searchParams.min_price}
+                                    className="bg-black/20 border-slate-700 focus:bg-black/40 text-white placeholder:text-slate-500 transition-all h-11"
+                                />
+                            </div>
 
-                        {/* Province */}
-                        <Select name="provincia" defaultValue={searchParams.provincia || 'todas'}>
-                            <SelectTrigger className="bg-black/20 border-slate-700 text-white h-11">
-                                <SelectValue placeholder="Província" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                <SelectItem value="todas">Todas Províncias</SelectItem>
-                                {PROVINCIAS.map(prov => (
-                                    <SelectItem key={prov} value={prov}>{prov}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                            {/* Price Max */}
+                            <div className="space-y-1.5">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 ml-1">Preço Máximo (MZN)</span>
+                                <Input
+                                    name="max_price"
+                                    type="number"
+                                    placeholder="Sem limite"
+                                    defaultValue={searchParams.max_price}
+                                    className="bg-black/20 border-slate-700 focus:bg-black/40 text-white placeholder:text-slate-500 transition-all h-11"
+                                />
+                            </div>
 
-                        <div className="flex gap-2">
-                            <Button type="submit" className="flex-1 bg-slate-800 hover:bg-slate-700 text-blue-400 font-bold h-11 border border-blue-500/20">
-                                Filtrar
-                            </Button>
-                            {(searchParams.categoria || searchParams.provincia || searchParams.search) && (
-                                <Button variant="ghost" asChild className="h-11 px-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
-                                    <Link href="/marketplace">
-                                        <FilterX className="h-5 w-5" />
-                                    </Link>
+                            <div className="lg:col-span-2 flex gap-2 pt-2 lg:pt-0">
+                                <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 shadow-lg shadow-blue-900/40 transition-all">
+                                    Aplicar Filtros
                                 </Button>
-                            )}
+                                {(searchParams.categoria || searchParams.provincia || searchParams.search || searchParams.min_price || searchParams.max_price || searchParams.cidade) && (
+                                    <Button variant="ghost" size="icon" asChild className="h-11 w-11 shrink-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors border border-slate-800">
+                                        <Link href="/marketplace">
+                                            <FilterX className="h-5 w-5" />
+                                        </Link>
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </form>
                 </Card>
