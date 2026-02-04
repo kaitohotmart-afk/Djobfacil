@@ -20,7 +20,7 @@ const completeProfileSchema = z.object({
     cidade: z.string().min(2, 'Digite sua cidade'),
     bairro: z.string().optional(),
     tipo_conta: z.enum(['prestador', 'cliente', 'ambos'], {
-        required_error: 'Selecione pelo menos uma opção',
+        message: 'Selecione pelo menos uma opção',
     }),
 })
 
